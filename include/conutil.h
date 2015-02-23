@@ -22,8 +22,8 @@
 // app argument parsing
 //
 
-#define __ARGSVI_S								conutil::__static_args_i()
-#define __ARGSVS_S								conutil::__static_args_s()
+#define __ARGSVI_S										conutil::__static_args_i()
+#define __ARGSVS_S										conutil::__static_args_s()
 
 #define ARG_PARSE_STATIC(I_ARG_C, PCH_ARG_V)			conutil::__parse_args(I_ARG_C, PCH_ARG_V);
 
@@ -370,7 +370,7 @@ namespace conutil
 
 			switch(stColor.eForeColor)
 			{
-			case conutil::COLOR_PURPLE: // Light Purple
+			case COLOR_PURPLE: // Light Purple
 #			ifdef _WIN
 				::SetConsoleTextAttribute(hStdOut,
 					(FOREGROUND_RED |
@@ -380,7 +380,7 @@ namespace conutil
 				fwrite("\033[0;35m", sizeof(char), 7, stdout);
 #			endif
 				break;
-			case conutil::COLOR_CYAN: // Light Cyan
+			case COLOR_CYAN: // Light Cyan
 #			ifdef _WIN
 				::SetConsoleTextAttribute(hStdOut,
 					(FOREGROUND_BLUE |
@@ -390,7 +390,7 @@ namespace conutil
 				fwrite("\033[0;36m", sizeof(char), 7, stdout);
 #			endif
 				break;
-			case conutil::COLOR_GREEN: // Light Green
+			case COLOR_GREEN: // Light Green
 #			ifdef _WIN
 				::SetConsoleTextAttribute(hStdOut,
 					(FOREGROUND_GREEN |
@@ -399,7 +399,7 @@ namespace conutil
 				fwrite("\033[0;32m", sizeof(char), 7, stdout);
 #			endif
 				break;
-			case conutil::COLOR_YELLOW: // Yellow
+			case COLOR_YELLOW: // Yellow
 #			ifdef _WIN
 				::SetConsoleTextAttribute(hStdOut,
 					(FOREGROUND_RED |
@@ -409,7 +409,7 @@ namespace conutil
 				fwrite("\033[0;33m", sizeof(char), 7, stdout);
 #			endif
 				break;
-			case conutil::COLOR_RED: // Light Red
+			case COLOR_RED: // Light Red
 #			ifdef _WIN
 				::SetConsoleTextAttribute(hStdOut,
 					(FOREGROUND_RED |
