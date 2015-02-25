@@ -4,6 +4,9 @@
 #include "conutil.h"
 
 
+// -----------------------------------------------------------------------------------
+// conutil_macro_SWITCH_STRTest
+
 TEST(conutil_macro_SWITCH_STRTest, General)
 {
 	const char* paszCaseStr[] = {
@@ -117,6 +120,9 @@ TEST(conutil_macro_SWITCH_STRTest, WithoutBreak)
 	}
 }
 
+// -----------------------------------------------------------------------------------
+// conutil_macro_FOREACH_STR_GETLINETest
+
 TEST(conutil_macro_FOREACH_STR_GETLINETest, General)
 {
 
@@ -146,7 +152,6 @@ TEST(conutil_macro_FOREACH_STR_GETLINETest, General)
 	}
 }
 
-
 TEST(conutil_macro_FOREACH_STR_GETLINETest, Inline)
 {
 	int i = 0;
@@ -154,4 +159,18 @@ TEST(conutil_macro_FOREACH_STR_GETLINETest, Inline)
 	FOREACH_STR_GETLINE(std::string cToken, szTestString, ':')
 		++i;
 	ASSERT_EQ(4, i);
+}
+
+TEST(conutil_macro_FOREACH_STR_GETLINETest, Break)
+{
+	int i = 0;
+	const char* szTestString = "TokenA:TokenB:TokenC:TokenD";
+
+	FOREACH_STR_GETLINE(std::string cToken, szTestString, ':')
+	{
+		++i;
+		break;
+	}
+
+	ASSERT_EQ(1, i);
 }
