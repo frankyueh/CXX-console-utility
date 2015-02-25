@@ -174,3 +174,19 @@ TEST(conutil_macro_FOREACH_STR_GETLINETest, Break)
 
 	ASSERT_EQ(1, i);
 }
+
+TEST(conutil_macro_FOREACH_STR_GETLINETest, Continue)
+{
+	int i = 0, j = 0;
+	const char* szTestString = "TokenA:TokenB:TokenC:TokenD";
+
+	FOREACH_STR_GETLINE(std::string cToken, szTestString, ':')
+	{
+		++i;
+		continue;
+		++j;
+	}
+
+	ASSERT_EQ(4, i);
+	ASSERT_EQ(0, j);
+}
