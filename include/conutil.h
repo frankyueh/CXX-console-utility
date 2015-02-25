@@ -24,15 +24,17 @@
 
 // string switch/case macro
 #define SWITCH_STR(STR)				std::string _cSwStr_ = STR; bool _bSwMatch_ = false, _bSwBreak_ = false; if (0)
-#define CASE_STR(CASE)				} if (_bSwMatch_ || (!_bSwBreak_ && (_bSwMatch_ = _cSwStr_ == CASE))) {
+#define CASE_STR(STR)				} if (_bSwMatch_ || (!_bSwBreak_ && (_bSwMatch_ = _cSwStr_ == STR))) {
 #define BREAK_STR					_bSwMatch_ = false, _bSwBreak_ = true
-#define DEFAULT_STR()				} if (!_bSwMatch_ && !_bSwBreak_) {
+#define DEFAULT_STR					} if (!_bSwMatch_ && !_bSwBreak_) {
 
 // 
-#define WHILE_GETLINE(CNEXTNAME, CSTRING, CSPLIT)			\
-	std::string CNEXTNAME;									\
-	std::istringstream _cNameStream_(CSTRING);				\
-	while (std::getline(_cNameStream_, CNEXTNAME, CSPLIT))
+#define FOREACH_STR_GETLINE(CNXT_STR_DECLARE, STR, CHSPLIT)				\
+	if(0){}else															\
+	for (conutil::__ForeachStrGetlineProxy cForeachProxy(STR, CHSPLIT) ;\
+		cForeachProxy.Condition() ; cForeachProxy.Next())				\
+		for (CNXT_STR_DECLARE = cForeachProxy.Current() ;				\
+			cForeachProxy.iBrkFlag ; --cForeachProxy.iBrkFlag)
 
 namespace conutil
 {
@@ -90,6 +92,36 @@ namespace conutil
 		for (cIt = cStr.begin(); cIt != cStr.end(); ++cIt)
 			*cIt = std::use_facet< std::ctype<_Elem> >(cLoc).tolower(*cIt);
 	}
+
+	class __ForeachStrGetlineProxy
+	{
+	public:
+		__ForeachStrGetlineProxy(const std::string& cStr, char chSplit) :
+			iBrkFlag(0),
+			m_cStrStream(cStr),
+			m_chSplitor(chSplit)
+		{
+			Next();
+		}
+		mutable int iBrkFlag;
+		bool Condition() const
+		{
+			return !iBrkFlag++ && !m_bIsEnd;
+		}
+		void Next()
+		{
+			m_bIsEnd = !std::getline(m_cStrStream, m_cCurrToken, m_chSplitor);
+		}
+		std::string Current() const
+		{
+			return m_cCurrToken;
+		}
+	private:
+		std::istringstream m_cStrStream;
+		char m_chSplitor;
+		std::string m_cCurrToken;
+		bool m_bIsEnd;
+	};
 }
 
 //
@@ -179,10 +211,10 @@ namespace conutil
 // method parameter parsing from text utility
 //
 
-#define PARS_USING(PARS)			std::map<int, std::string> &__cParasMap__ = PARS
-#define PARS_PARSE(PARSSTR)			__cParasMap__ = conutil::__parse_pars(PARSSTR);
+#define PARS_USING(PARS)			std::map<int, std::string> &__cLocalParasMap__ = PARS
+#define PARS_PARSE(PARSSTR)			__cLocalParasMap__ = conutil::__parse_pars(PARSSTR);
 
-#define PAR_OR_DEF(IND, DEF)		(IND < __cParas__.size() ? __cParas__[IND] : std::string(DEF))
+#define PAR_OR_DEF(IND, DEF)		(IND < __cLocalParasMap__.size() ? __cLocalParasMap__[IND] : std::string(DEF))
 #define PAR0_OR_DEF(DEF)			PAR_OR_DEF(0, DEF)
 #define PAR1_OR_DEF(DEF)			PAR_OR_DEF(1, DEF)
 #define PAR2_OR_DEF(DEF)			PAR_OR_DEF(2, DEF)
@@ -193,7 +225,7 @@ namespace conutil
 #define PAR7_OR_DEF(DEF)			PAR_OR_DEF(7, DEF)
 #define PAR8_OR_DEF(DEF)			PAR_OR_DEF(8, DEF)
 #define PAR9_OR_DEF(DEF)			PAR_OR_DEF(9, DEF)
-#define PAR_OR_DEF_INT(IND, DEF)	(IND < __cParas__.size() ? conutil::atoi(__cParas__[IND].c_str()) : DEF)
+#define PAR_OR_DEF_INT(IND, DEF)	(IND < __cLocalParasMap__.size() ? conutil::atoi(__cLocalParasMap__[IND].c_str()) : DEF)
 #define PAR0_OR_DEF_INT(DEF)		PAR_OR_DEF_INT(0, DEF)
 #define PAR1_OR_DEF_INT(DEF)		PAR_OR_DEF_INT(1, DEF)
 #define PAR2_OR_DEF_INT(DEF)		PAR_OR_DEF_INT(2, DEF)
@@ -296,7 +328,7 @@ namespace conutil
 			std::string cColorFilter = szColorFilter;
 			tolower(cColorFilter);
 
-			WHILE_GETLINE(cColor, szColorFilter, ':')
+			FOREACH_STR_GETLINE(std::string cColor, szColorFilter, ':')
 			{
 				bool bNot = cColor.find('~') == 0;
 				if (bNot)
@@ -340,7 +372,7 @@ namespace conutil
 						else
 							__COLORFILTER_S |= COLOR_RED;
 					BREAK_STR;
-					DEFAULT_STR()
+					DEFAULT_STR
 						if (bNot)
 							__COLORFILTER_S &= COLOR_ALL ^ 0xFF;
 						else

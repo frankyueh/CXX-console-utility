@@ -4,9 +4,9 @@
 #include "conutil.h"
 
 
-TEST(conutil_SWITCH_STRTest, General)
+TEST(conutil_macro_SWITCH_STRTest, General)
 {
-	char* paszCaseStr[] = {
+	const char* paszCaseStr[] = {
 		"CaseA", "CaseB", "CaseC", "CaseD", "Default"
 	};
 	size_t sCaseStrSize = sizeof(paszCaseStr) / sizeof(char*);
@@ -33,9 +33,9 @@ TEST(conutil_SWITCH_STRTest, General)
 	}
 }
 
-TEST(conutil_SWITCH_STRTest, StringType)
+TEST(conutil_macro_SWITCH_STRTest, StringType)
 {
-	char* paszCaseStr[] = {
+	const char* paszCaseStr[] = {
 		"CaseA", "CaseB", "CaseC", "CaseD", "Default"
 	};
 	size_t sCaseStrSize = sizeof(paszCaseStr) / sizeof(char*);
@@ -62,9 +62,9 @@ TEST(conutil_SWITCH_STRTest, StringType)
 	}
 }
 
-TEST(conutil_SWITCH_STRTest, WithoutBreak)
+TEST(conutil_macro_SWITCH_STRTest, WithoutBreak)
 {
-	char* paszCaseStr[] = {
+	const char* paszCaseStr[] = {
 		"CaseA", "CaseB", "CaseC", "CaseD", "Default"
 	};
 	size_t sCaseStrSize = sizeof(paszCaseStr) / sizeof(char*);
@@ -114,5 +114,25 @@ TEST(conutil_SWITCH_STRTest, WithoutBreak)
 				if (strcmp("Default", paszCaseStr[i]) == 0)
 					ASSERT_EQ(0, j);
 		}
+	}
+}
+
+TEST(conutil_macro_FOREACH_STR_GETLINETest, General)
+{
+
+	int i = 0;
+	const char* szTestString = "TokenA:TokenB:TokenC:TokenD";
+
+	FOREACH_STR_GETLINE(std::string cToken, szTestString, ':')
+	{
+		if (cToken == "TokenA")
+			ASSERT_EQ(0, i);
+		else if (cToken == "TokenB")
+			ASSERT_EQ(1, i);
+		else if (cToken == "TokenC")
+			ASSERT_EQ(2, i);
+		else
+			ASSERT_EQ(3, i);
+		++i;
 	}
 }
