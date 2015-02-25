@@ -19,143 +19,6 @@
 //
 // -----------------------------------------------------------------------------------
 //
-// app argument parsing
-//
-
-#define __ARGSVI_S										conutil::__static_args_i()
-#define __ARGSVS_S										conutil::__static_args_s()
-
-#define ARG_PARSE_STATIC(I_ARG_C, PCH_ARG_V)			conutil::__parse_args(I_ARG_C, PCH_ARG_V);
-
-#define ARG_CLEAR_STATIC()								__ARGSVI_S.clear();	__ARGSVS_S.clear();
-
-#define ARGI(I_IND)										__ARGSVI_S[I_IND]
-#define ARGI_S(I_IND)									__ARGSVI_S[I_IND].size()
-#define ARGI_INT(I_IND)									conutil::atoi(ARGI(I_IND).c_str())
-#define ARGI_ILL(I_IND)									conutil::atoill(ARGI(I_IND).c_str())
-#define IS_ARGI(I_IND)									(ARGI(I_IND).length() != 0)
-#define HAS_ARGI(I_IND)									(__ARGSVI_S.find(I_IND) != __ARGSVI_S.end())
-#define ARGA_OR_DEF(I_IND, C_DEF)						(IS_ARGI(I_IND) ? ARGI(I_IND) : std::string(C_DEF))
-#define HAS_ARGI_OR_DEF(I_IND, C_DEF)					(HAS_ARGI(I_IND) ? ARGI(I_IND) : std::string(C_DEF))
-#define ARGA_OR_DEF_INT(I_IND, I_DEF)					HAS_ARGI_OR_DEF_INT(I_IND, 1, I_DEF)
-#define HAS_ARGI_OR_DEF_INT(I_IND, I_DEF, I_HDEF)		(HAS_ARGI(I_IND) ? (IS_ARGI(I_IND) ? ARGI_INT(I_IND) : I_DEF) : I_HDEF)
-#define ARGA_OR_DEF_ILL(I_IND, I64_DEF)					HAS_ARGI_OR_DEF_ILL(I_IND, 1, I64_DEF)
-#define HAS_ARGI_OR_DEF_ILL(I_IND, I64_DEF, I64_HDEF)	(HAS_ARGI(I_IND) ? (IS_ARGI(I_IND) ? ARGI_ILL(I_IND) : I64_DEF) : I64_HDEF)
-
-#define ARGS(C_ARG)										__ARGSVS_S[C_ARG]
-#define ARGS_SIZE(C_ARG)								__ARGSVS_S.size()
-#define ARGS_INT(C_ARG)									conutil::atoi(ARGS(C_ARG).c_str())
-#define ARGS_ILL(C_ARG)									conutil::atoill(ARGS(C_ARG).c_str())
-#define IS_ARGS(C_ARG)									(ARGS(C_ARG).length() != 0)
-#define HAS_ARGS(C_ARG)									(__ARGSVS_S.find(C_ARG) != __ARGSVS_S.end())
-#define ARG_OR_DEF(C_ARG, C_DEF)						(IS_ARGS(C_ARG) ? ARGS(C_ARG) : std::string(C_DEF))
-#define HAS_ARGS_OR_DEF(C_ARG, C_DEF)					(HAS_ARGS(C_ARG) ? ARGS(C_ARG) : std::string(C_DEF))
-#define ARG_OR_DEF_INT(C_ARG, I_DEF)					HAS_ARGS_OR_DEF_INT(C_ARG, 1, I_DEF)
-#define HAS_ARGS_OR_DEF_INT(C_ARG, I_DEF, I_HDEF)		(HAS_ARGS(C_ARG) ? (IS_ARGS(C_ARG) ? ARGS_INT(C_ARG) : I_DEF) : I_HDEF)
-#define ARG_OR_DEF_ILL(C_ARG, I64_DEF)					HAS_ARGS_OR_DEF_ILL(C_ARG, 1, I64_DEF)
-#define HAS_ARGS_OR_DEF_ILL(C_ARG, I64_DEF, I64_HDEF)	(HAS_ARGS(C_ARG) ? (IS_ARGS(C_ARG) ? ARGS_ILL(C_ARG) : I64_DEF) : I64_HDEF)
-
-namespace conutil
-{
-	inline std::map<std::string, std::string>& __static_args_s()
-	{
-		static std::map<std::string, std::string> s_cArgs;
-		return s_cArgs;
-	}
-
-	inline std::map<int, std::string>& __static_args_i()
-	{
-		static std::map<int, std::string> s_cArgsa;
-		return s_cArgsa;
-	}
-
-	inline void __parse_args(int iArgc, char** pchArgv)
-	{
-		__ARGSVI_S.clear();
-		__ARGSVS_S.clear();
-
-		std::string cOpt;
-		int c = 0;
-		for (int i = 1 ; i < iArgc ; ++i)
-		{
-			if (pchArgv[i][0] == '-' && pchArgv[i][1] == '-')
-			{
-				cOpt = pchArgv[i];
-				__ARGSVS_S[cOpt] = "";
-			}
-			else if (cOpt.length())
-			{
-				__ARGSVS_S[cOpt] = pchArgv[i];
-				cOpt.clear();
-			}
-			else
-			{
-				__ARGSVI_S[c] = pchArgv[i];
-			}
-		}
-	}
-}
-
-//
-// -----------------------------------------------------------------------------------
-//
-// method parameter parsing from text utility
-//
-
-#define PARS_USING(PARS)			map<int, std::string> &__cParasMap__ = PARS
-
-#define PARS_MAKING(PARSSTR)								\
-	std::istringstream _cParaStream_(PARSSTR);				\
-	if (std::getline(_cParaStream_, PARSSTR, '('))			\
-	{														\
-		int i = 0;											\
-		std::string _cPara_;								\
-		while (std::getline(_cParaStream_, _cPara_, ','))	\
-		{													\
-			size_t s = _cPara_.find_first_of(')');			\
-			if (s != std::string::npos)						\
-				_cPara_ = _cPara_.substr(0, s);				\
-			__cParasMap__[i++] = conutil::trim(_cPara_);	\
-		}													\
-	}
-
-#define PAR_OR_DEF(IND, DEF)		(IND < __cParas__.size() ? __cParas__[IND] : std::string(DEF))
-#define PAR0_OR_DEF(DEF)			PAR_OR_DEF(0, DEF)
-#define PAR1_OR_DEF(DEF)			PAR_OR_DEF(1, DEF)
-#define PAR2_OR_DEF(DEF)			PAR_OR_DEF(2, DEF)
-#define PAR3_OR_DEF(DEF)			PAR_OR_DEF(3, DEF)
-#define PAR4_OR_DEF(DEF)			PAR_OR_DEF(4, DEF)
-#define PAR5_OR_DEF(DEF)			PAR_OR_DEF(5, DEF)
-#define PAR6_OR_DEF(DEF)			PAR_OR_DEF(6, DEF)
-#define PAR7_OR_DEF(DEF)			PAR_OR_DEF(7, DEF)
-#define PAR8_OR_DEF(DEF)			PAR_OR_DEF(8, DEF)
-#define PAR9_OR_DEF(DEF)			PAR_OR_DEF(9, DEF)
-#define PAR_OR_DEF_INT(IND, DEF)	(IND < __cParas__.size() ? conutil::atoi(__cParas__[IND].c_str()) : DEF)
-#define PAR0_OR_DEF_INT(DEF)		PAR_OR_DEF_INT(0, DEF)
-#define PAR1_OR_DEF_INT(DEF)		PAR_OR_DEF_INT(1, DEF)
-#define PAR2_OR_DEF_INT(DEF)		PAR_OR_DEF_INT(2, DEF)
-#define PAR3_OR_DEF_INT(DEF)		PAR_OR_DEF_INT(3, DEF)
-#define PAR4_OR_DEF_INT(DEF)		PAR_OR_DEF_INT(4, DEF)
-#define PAR5_OR_DEF_INT(DEF)		PAR_OR_DEF_INT(5, DEF)
-#define PAR6_OR_DEF_INT(DEF)		PAR_OR_DEF_INT(6, DEF)
-#define PAR7_OR_DEF_INT(DEF)		PAR_OR_DEF_INT(7, DEF)
-#define PAR8_OR_DEF_INT(DEF)		PAR_OR_DEF_INT(8, DEF)
-#define PAR9_OR_DEF_INT(DEF)		PAR_OR_DEF_INT(9, DEF)
-#define PAR_OR_DEF_ILL(IND, DEF)	(IND < __cParas__.size() ? conutil::atoill(__cParas__[IND].c_str()) : DEF)
-#define PAR0_OR_DEF_ILL(DEF)		PAR_OR_DEF_ILL(0, DEF)
-#define PAR1_OR_DEF_ILL(DEF)		PAR_OR_DEF_ILL(1, DEF)
-#define PAR2_OR_DEF_ILL(DEF)		PAR_OR_DEF_ILL(2, DEF)
-#define PAR3_OR_DEF_ILL(DEF)		PAR_OR_DEF_ILL(3, DEF)
-#define PAR4_OR_DEF_ILL(DEF)		PAR_OR_DEF_ILL(4, DEF)
-#define PAR5_OR_DEF_ILL(DEF)		PAR_OR_DEF_ILL(5, DEF)
-#define PAR6_OR_DEF_ILL(DEF)		PAR_OR_DEF_ILL(6, DEF)
-#define PAR7_OR_DEF_ILL(DEF)		PAR_OR_DEF_ILL(7, DEF)
-#define PAR8_OR_DEF_ILL(DEF)		PAR_OR_DEF_ILL(8, DEF)
-#define PAR9_OR_DEF_ILL(DEF)		PAR_OR_DEF_ILL(9, DEF)
-
-//
-// -----------------------------------------------------------------------------------
-//
 // string function and macro
 //
 
@@ -226,6 +89,157 @@ namespace conutil
 		typename std::basic_string<_Elem, _Traits>::iterator cIt;
 		for (cIt = cStr.begin(); cIt != cStr.end(); ++cIt)
 			*cIt = std::use_facet< std::ctype<_Elem> >(cLoc).tolower(*cIt);
+	}
+}
+
+//
+// -----------------------------------------------------------------------------------
+//
+// app argument parsing
+//
+
+#define __ARGIV_S										conutil::__static_args_i()
+#define __ARGKV_S										conutil::__static_args_s()
+
+#define ARG_PARSE_STATIC(I_ARG_C, PCH_ARG_V)			conutil::__parse_args(I_ARG_C, PCH_ARG_V);
+
+#define ARG_CLEAR_STATIC()								__ARGIV_S.clear();	__ARGKV_S.clear();
+
+#define ARGI_SIZE()										__ARGIV_S.size()
+#define ARGI(I_IND)										__ARGIV_S[I_IND]
+#define ARGI_INT(I_IND)									conutil::atoi(ARGI(I_IND).c_str())
+#define ARGI_ILL(I_IND)									conutil::atoill(ARGI(I_IND).c_str())
+#define HAS_ARGI(I_IND)									(__ARGIV_S.find(I_IND) != __ARGIV_S.end())
+#define HAS_ARGI_OR_DEF(I_IND, C_DEF)					(HAS_ARGI(I_IND) ? ARGI(I_IND) : std::string(C_DEF))
+#define HAS_ARGI_OR_DEF_INT(I_IND, I_DEF)				(HAS_ARGI(I_IND) ? ARGI_INT(I_IND) : I_DEF)
+#define HAS_ARGI_OR_DEF_ILL(I_IND, I64_DEF)				(HAS_ARGI(I_IND) ? ARGI_ILL(I64_IND) : I64_DEF)
+
+#define ARGK_SIZE()										__ARGKV_S.size()
+#define ARGK(C_ARG)										__ARGKV_S[C_ARG]
+#define ARGK_INT(C_ARG)									conutil::atoi(ARGK(C_ARG).c_str())
+#define ARGK_ILL(C_ARG)									conutil::atoill(ARGK(C_ARG).c_str())
+#define IS_ARGK(C_ARG)									(ARGK(C_ARG).length() != 0)
+#define HAS_ARGK(C_ARG)									(__ARGKV_S.find(C_ARG) != __ARGKV_S.end())
+#define ARGK_OR_DEF(C_ARG, C_DEF)						(IS_ARGK(C_ARG) ? ARGK(C_ARG) : std::string(C_DEF))
+#define HAS_ARGK_OR_DEF(C_ARG, C_DEF)					(HAS_ARGK(C_ARG) ? ARGK(C_ARG) : std::string(C_DEF))
+#define ARGK_OR_DEF_INT(C_ARG, I_DEF)					HAS_ARGK_OR_DEF_INT(C_ARG, 1, I_DEF)
+#define HAS_ARGK_OR_DEF_INT(C_ARG, I_DEF, I_HDEF)		(HAS_ARGK(C_ARG) ? (IS_ARGK(C_ARG) ? ARGK_INT(C_ARG) : I_DEF) : I_HDEF)
+#define ARGK_OR_DEF_ILL(C_ARG, I64_DEF)					HAS_ARGK_OR_DEF_ILL(C_ARG, 1, I64_DEF)
+#define HAS_ARGK_OR_DEF_ILL(C_ARG, I64_DEF, I64_HDEF)	(HAS_ARGK(C_ARG) ? (IS_ARGK(C_ARG) ? ARGK_ILL(C_ARG) : I64_DEF) : I64_HDEF)
+
+namespace conutil
+{
+	inline std::map<std::string, std::string>& __static_args_s()
+	{
+		static std::map<std::string, std::string> s_cArgs;
+		return s_cArgs;
+	}
+
+	inline std::map<int, std::string>& __static_args_i()
+	{
+		static std::map<int, std::string> s_cArgsa;
+		return s_cArgsa;
+	}
+
+	inline void __parse_args(int iArgc, char** paszArgv)
+	{
+		__ARGIV_S.clear();
+		__ARGKV_S.clear();
+
+		int c = 0;
+		for (int i = 0 ; i < iArgc ; ++i)
+		{
+			if (i == 0 ||
+				paszArgv[i][0] != '-' ||
+				paszArgv[i][1] != '-')
+			{
+				__ARGIV_S[c++] = paszArgv[i];
+			}
+			else
+			{
+				char* szKeyPos = paszArgv[i] + 2;
+				char* szValPos = strchr(paszArgv[i], '=');
+				if (szValPos)
+				{
+					__ARGKV_S[std::string(szKeyPos, szValPos - szKeyPos)] =
+						szValPos + 1;
+				}
+				else
+				{
+					__ARGKV_S[szKeyPos] = "";
+				}
+			}
+		}
+	}
+}
+
+//
+// -----------------------------------------------------------------------------------
+//
+// method parameter parsing from text utility
+//
+
+#define PARS_USING(PARS)			std::map<int, std::string> &__cParasMap__ = PARS
+#define PARS_PARSE(PARSSTR)			__cParasMap__ = conutil::__parse_pars(PARSSTR);
+
+#define PAR_OR_DEF(IND, DEF)		(IND < __cParas__.size() ? __cParas__[IND] : std::string(DEF))
+#define PAR0_OR_DEF(DEF)			PAR_OR_DEF(0, DEF)
+#define PAR1_OR_DEF(DEF)			PAR_OR_DEF(1, DEF)
+#define PAR2_OR_DEF(DEF)			PAR_OR_DEF(2, DEF)
+#define PAR3_OR_DEF(DEF)			PAR_OR_DEF(3, DEF)
+#define PAR4_OR_DEF(DEF)			PAR_OR_DEF(4, DEF)
+#define PAR5_OR_DEF(DEF)			PAR_OR_DEF(5, DEF)
+#define PAR6_OR_DEF(DEF)			PAR_OR_DEF(6, DEF)
+#define PAR7_OR_DEF(DEF)			PAR_OR_DEF(7, DEF)
+#define PAR8_OR_DEF(DEF)			PAR_OR_DEF(8, DEF)
+#define PAR9_OR_DEF(DEF)			PAR_OR_DEF(9, DEF)
+#define PAR_OR_DEF_INT(IND, DEF)	(IND < __cParas__.size() ? conutil::atoi(__cParas__[IND].c_str()) : DEF)
+#define PAR0_OR_DEF_INT(DEF)		PAR_OR_DEF_INT(0, DEF)
+#define PAR1_OR_DEF_INT(DEF)		PAR_OR_DEF_INT(1, DEF)
+#define PAR2_OR_DEF_INT(DEF)		PAR_OR_DEF_INT(2, DEF)
+#define PAR3_OR_DEF_INT(DEF)		PAR_OR_DEF_INT(3, DEF)
+#define PAR4_OR_DEF_INT(DEF)		PAR_OR_DEF_INT(4, DEF)
+#define PAR5_OR_DEF_INT(DEF)		PAR_OR_DEF_INT(5, DEF)
+#define PAR6_OR_DEF_INT(DEF)		PAR_OR_DEF_INT(6, DEF)
+#define PAR7_OR_DEF_INT(DEF)		PAR_OR_DEF_INT(7, DEF)
+#define PAR8_OR_DEF_INT(DEF)		PAR_OR_DEF_INT(8, DEF)
+#define PAR9_OR_DEF_INT(DEF)		PAR_OR_DEF_INT(9, DEF)
+#define PAR_OR_DEF_ILL(IND, DEF)	(IND < __cParas__.size() ? conutil::atoill(__cParas__[IND].c_str()) : DEF)
+#define PAR0_OR_DEF_ILL(DEF)		PAR_OR_DEF_ILL(0, DEF)
+#define PAR1_OR_DEF_ILL(DEF)		PAR_OR_DEF_ILL(1, DEF)
+#define PAR2_OR_DEF_ILL(DEF)		PAR_OR_DEF_ILL(2, DEF)
+#define PAR3_OR_DEF_ILL(DEF)		PAR_OR_DEF_ILL(3, DEF)
+#define PAR4_OR_DEF_ILL(DEF)		PAR_OR_DEF_ILL(4, DEF)
+#define PAR5_OR_DEF_ILL(DEF)		PAR_OR_DEF_ILL(5, DEF)
+#define PAR6_OR_DEF_ILL(DEF)		PAR_OR_DEF_ILL(6, DEF)
+#define PAR7_OR_DEF_ILL(DEF)		PAR_OR_DEF_ILL(7, DEF)
+#define PAR8_OR_DEF_ILL(DEF)		PAR_OR_DEF_ILL(8, DEF)
+#define PAR9_OR_DEF_ILL(DEF)		PAR_OR_DEF_ILL(9, DEF)
+
+namespace conutil
+{
+	inline std::map<int, std::string> __parse_pars(std::string cParsString)
+	{
+		std::map<int, std::string> cParasMap;
+		std::istringstream cParaStream(cParsString);
+
+		if (std::getline(cParaStream, cParsString, '('))
+		{
+			int i = 0;
+			std::string cPara;
+
+			while (std::getline(cParaStream, cPara, ','))
+			{
+				size_t s = cPara.find_first_of(')');
+
+				if (s != std::string::npos)
+					cPara = cPara.substr(0, s);
+
+				conutil::trim(cPara);
+				cParasMap[i++] = cPara;
+			}
+		}
+		return cParasMap;
 	}
 }
 
