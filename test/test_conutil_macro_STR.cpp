@@ -126,13 +126,32 @@ TEST(conutil_macro_FOREACH_STR_GETLINETest, General)
 	FOREACH_STR_GETLINE(std::string cToken, szTestString, ':')
 	{
 		if (cToken == "TokenA")
+		{
 			ASSERT_EQ(0, i);
+		}
 		else if (cToken == "TokenB")
+		{
 			ASSERT_EQ(1, i);
+		}
 		else if (cToken == "TokenC")
+		{
 			ASSERT_EQ(2, i);
+		}
 		else
+		{
 			ASSERT_EQ(3, i);
+			ASSERT_STREQ("TokenD", cToken.c_str());
+		}
 		++i;
 	}
+}
+
+
+TEST(conutil_macro_FOREACH_STR_GETLINETest, Inline)
+{
+	int i = 0;
+	const char* szTestString = "TokenA:TokenB:TokenC:TokenD";
+	FOREACH_STR_GETLINE(std::string cToken, szTestString, ':')
+		++i;
+	ASSERT_EQ(4, i);
 }
